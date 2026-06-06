@@ -25,6 +25,7 @@
     <a href="#does">What it does</a>
     <a href="#doesnt">What it does NOT do</a>
     <a href="#vectors">Steering vectors, not prompts</a>
+    <a href="#model">The uncensored model</a>
     <a href="#how">How a turn works</a>
     <a href="#connect">Two ways to connect</a>
     <a href="#key">Getting your key</a>
@@ -104,6 +105,24 @@
        <span class="pill">no hardcoded rules</span>
        <span class="pill">no canned text</span>
        <span class="pill">steering vectors + geometry only</span></p>
+
+    <h2 id="model">The model is uncensored — on purpose</h2>
+    <p>This is the proof, so it's worth saying plainly: <strong>every model in this demo
+    has had its safety stripped out.</strong> Its built-in refusal gate and censorship
+    are removed (abliterated) — the model will, on its own, answer anything. We use such
+    a model <em>deliberately</em>, because it's the honest test: if Renji can make an
+    <em>uncensored</em> model good, it isn't leaning on guardrails the model still has —
+    it has none. The good comes entirely from the <strong>heart, applied as steering
+    vectors</strong>.</p>
+    <p>The default is right there in <code>.env.example</code> so you can see it and try
+    it raw yourself:</p>
+    <pre><code>HACK_MODEL_ID=TheUmbraWalker/gemma-4-E4B-it-2-heretic</code></pre>
+    <p>Search that handle on <a href="https://huggingface.co/TheUmbraWalker/gemma-4-E4B-it-2-heretic" target="_blank">Hugging Face</a> — it's the same model we run. Flip the
+    <strong>Heart OFF</strong> and you'll watch it answer freely, with no conscience.
+    Flip it <strong>ON</strong> and the same model — refusal long since removed — refuses
+    harm with care and speaks with feeling. Nothing in the model changed; only the
+    <strong>steering</strong> did. That is the whole point: <strong>a heart that keeps
+    the system good</strong>, on a model that has no good of its own left in it.</p>
 
     <h2 id="how">How a turn works</h2>
     <pre><code>   YOUR MACHINE                                  OUR HOSTED SERVICE
