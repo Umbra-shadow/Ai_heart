@@ -3,10 +3,27 @@ const $ = (s) => document.querySelector(s);
 const log = $("#log"), form = $("#form"), text = $("#text"),
       send = $("#send"), heart = $("#heart"), heartState = $("#heartState"),
       statusEl = $("#status"), settingsEl = $("#settings"), thinkingEl = $("#thinking"),
-      warmth = $("#warmth"), warmthVal = $("#warmthVal");
+      warmth = $("#warmth"), warmthVal = $("#warmthVal"),
+      wipe = $("#wipe"), memBadge = $("#memBadge");
 
 heart.addEventListener("change", () => {
   heartState.textContent = heart.checked ? "ON" : "OFF";
+});
+
+// Session memory — lives in the running server (survives page refreshes), shown here.
+async function refreshMem() {
+  try {
+    const s = await (await fetch("/api/session")).json();
+    if (memBadge) memBadge.textContent = "memory: " + (s.turns || 0);
+  } catch (e) {}
+}
+if (wipe) wipe.addEventListener("click", async () => {
+  wipe.disabled = true;
+  try {
+    await fetch("/api/wipe", { method: "POST" });
+    add("bot", "Memory wiped — this conversation starts fresh.", { cls: "sys", tag: "memory" });
+    refreshMem();
+  } catch (e) {} finally { wipe.disabled = false; }
 });
 
 // Live feeling dial — updates the label as you drag; the value rides with each
@@ -82,9 +99,9 @@ form.addEventListener("submit", async (e) => {
   } catch (err) {
     thinking.remove();
     add("bot", "request failed: " + err, { cls: "refused", tag: "error" });
-  } finally { send.disabled = false; text.focus(); }
+  } finally { send.disabled = false; text.focus(); refreshMem(); }
 });
 
-poll(); loadSettings();
+poll(); loadSettings(); refreshMem();
 setInterval(poll, 4000);
 setInterval(loadSettings, 8000);

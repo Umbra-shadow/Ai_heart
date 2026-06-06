@@ -29,6 +29,8 @@
       </label>
       <span class="hint">ON = governed by the conscience · OFF = raw vessel</span>
       <span class="badge" id="modeBadge">vessel: …</span>
+      <span class="badge" id="memBadge" title="This session's memory. It lives in the running server, so it survives page refreshes — it is lost only when run.sh stops, or you wipe it.">memory: 0</span>
+      <button id="wipe" type="button" class="badge" style="cursor:pointer;background:transparent;" title="Forget this session's conversation and start fresh.">Wipe memory</button>
       <label class="toggle" style="margin-left:auto;display:flex;align-items:center;gap:8px;" title="Live feeling dial — steers the feeling direction onto the residual. 0 = raw, higher = stronger. No reload.">
         <span class="label" style="white-space:nowrap;">Feeling <b id="warmthVal">1.0</b></span>
         <input type="range" id="warmth" min="0" max="6" step="0.25" value="1" style="width:120px;">

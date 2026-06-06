@@ -58,6 +58,15 @@ Three tabs:
   the **PDF**.
 - **Docs** — the explainer.
 
+> ### ⚠️ Memory is per-session — it lives only while `run.sh` is up
+> Each `./run.sh` launch gets its **own session**, so if several people use the same
+> heart their conversations never mix. That session's memory is held **in the running
+> server**, so you can **refresh the page as many times as you like — the memory
+> stays**. But it is **NOT saved to disk**: the moment you **stop `run.sh`** (or click
+> **Wipe memory**), the whole conversation is **gone for good**. This is a deliberate
+> simplification for the demo — the **live Renji product keeps proper, persistent,
+> per-user memory** instead. Don't stop the process mid-demo unless you mean to forget.
+
 ---
 
 ## 3. Your model

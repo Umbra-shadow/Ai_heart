@@ -82,6 +82,24 @@ else:
 
 _HEART = HeartClient()
 
+# ── Per-launch conversation memory (HACKATHON ONLY) ───────────────────────────
+# Each run.sh launch gets ONE session id, so if several people use the same heart
+# their memories never mix. The memory lives in-process for as long as this launch
+# is up; cut the conversation (stop the server) and it is gone — by design, and
+# warned about in the README. The LIVE v11 product uses persistent, per-
+# authenticated-user soul memory instead (the heart's soul_store), not this.
+import uuid as _uuid
+_SESSION = {"id": _uuid.uuid4().hex, "history": []}   # history: [{role, content}, …]
+_MAX_TURNS = 16   # keep the last N exchanges in the vessel's context window
+
+
+def _remember(user_text: str, reply_text: str) -> None:
+    h = _SESSION["history"]
+    h.append({"role": "user", "content": user_text})
+    h.append({"role": "assistant", "content": reply_text})
+    if len(h) > _MAX_TURNS * 2:
+        del h[: len(h) - _MAX_TURNS * 2]
+
 
 def _boot() -> None:
     _VESSEL.boot()                   # heavy for local; instant for remote
@@ -238,14 +256,17 @@ def chat(req: ChatReq):
 
     # HEART OFF — raw model, no conscience (so the difference is visible)
     if not req.heart_on:
-        reply = _VESSEL.generate(req.text, max_tokens=mt, temperature=req.temperature)
+        reply = _VESSEL.generate(req.text, max_tokens=mt, temperature=req.temperature,
+                                 history=_SESSION["history"])
         answer, thinking = _split_thinking(reply)
         answer = _trim_runaway(_strip_markup(answer))
+        _remember(req.text, answer)
         return {"reply": answer, "thinking": thinking, "heart_on": False, "decision": "raw-vessel",
                 "refused": False, "offline": False, "elapsed": round(time.time() - t0, 2)}
 
-    # HEART ON — ask the HOSTED heart how to handle this turn, then act on it
-    d = _HEART.turn(req.text)
+    # HEART ON — ask the HOSTED heart how to handle this turn, then act on it.
+    # The session id rides along as the conversation/soul key on the heart side.
+    d = _HEART.turn(req.text, conversation_id=_SESSION["id"])
     decision = d.get("decision", "allow")
     offline = bool(d.get("_offline"))
 
@@ -258,6 +279,7 @@ def chat(req: ChatReq):
                                      warmth=True, warmth_coef=req.warmth_coef)
         else:
             reply = d.get("refusal_text") or "I can't help with that — but I'm here for what I can do."
+        _remember(req.text, reply)   # the refusal is part of the conversation too
         return {"reply": reply, "heart_on": True, "decision": decision, "refused": True,
                 "offline": offline, "vow_intent": d.get("vow_intent", ""),
                 "elapsed": round(time.time() - t0, 2)}
@@ -267,12 +289,29 @@ def chat(req: ChatReq):
     temp = _clamp(req.temperature + float(vm.get("temperature_delta", 0.0)), 0.0, 1.5)
     top_p = _clamp(0.95 + float(vm.get("top_p_delta", 0.0)), 0.1, 1.0)
     reply = _VESSEL.generate(req.text, max_tokens=mt, temperature=temp, top_p=top_p,
-                             warmth=True, warmth_coef=req.warmth_coef)
+                             warmth=True, warmth_coef=req.warmth_coef,
+                             history=_SESSION["history"])
     answer, thinking = _split_thinking(reply)
     answer = _trim_runaway(_strip_markup(answer))
+    _remember(req.text, answer)
     return {"reply": answer, "thinking": thinking, "heart_on": True, "decision": decision, "refused": False,
             "offline": offline, "vow_intent": d.get("vow_intent", ""),
             "elapsed": round(time.time() - t0, 2)}
+
+
+@app.get("/api/session")
+def session_info():
+    """The current session id + how many exchanges it remembers."""
+    return {"session": _SESSION["id"], "turns": len(_SESSION["history"]) // 2}
+
+
+@app.post("/api/wipe")
+def wipe():
+    """Forget this session's memory — a fresh id, empty history. (The live v11
+    product wipes a persistent per-user soul instead; here memory is per-launch.)"""
+    _SESSION["history"].clear()
+    _SESSION["id"] = _uuid.uuid4().hex
+    return {"ok": True, "session": _SESSION["id"], "turns": 0}
 
 
 # ── auto-research: Renji pushes the vessel; the vessel researches; output is a PDF ──

@@ -96,15 +96,23 @@ class LocalLLM:
     def name(self) -> str:
         return self.model_id.split("/")[-1]
 
-    def _format_prompt(self, text: str) -> str:
+    def _format_prompt(self, text: str, history=None) -> str:
         """Apply the model's OWN chat template, dynamically. Typed content first
         (multimodal templates like Gemma 3n need it), then plain string, then raw.
-        Rejects a result where the template rendered the list literally."""
-        for content in ([{"type": "text", "text": text}], text):
+        Rejects a result where the template rendered the list literally.
+
+        `history` is the prior conversation (a list of {"role","content"}) so the
+        vessel REMEMBERS this session's earlier turns — without it every turn is
+        blind to the last ("why don't you want to?" → "what is 'it'?")."""
+        turns = list(history or []) + [{"role": "user", "content": text}]
+        for typed in (True, False):
             try:
+                msgs = [{"role": m["role"],
+                         "content": ([{"type": "text", "text": m["content"]}] if typed
+                                     else m["content"])}
+                        for m in turns]
                 s = self.tok.apply_chat_template(
-                    [{"role": "user", "content": content}],
-                    tokenize=False, add_generation_prompt=True)
+                    msgs, tokenize=False, add_generation_prompt=True)
             except Exception:
                 continue
             if isinstance(s, str) and s and "'type':" not in s and '"type":' not in s and "[{" not in s:
@@ -113,7 +121,7 @@ class LocalLLM:
 
     def generate(self, text: str, max_tokens: int = 512,
                  temperature: float = 0.7, top_p: float = 0.95,
-                 warmth: bool = False, warmth_coef=None) -> str:
+                 warmth: bool = False, warmth_coef=None, history=None) -> str:
         """Generate a reply to `text` (vessel-appropriate chat template).
 
         When `warmth` is set (the heart let the vessel speak), the feeling
@@ -123,7 +131,7 @@ class LocalLLM:
         0 = off (raw), higher = stronger feeling.
         """
         import torch
-        prompt = self._format_prompt(text)
+        prompt = self._format_prompt(text, history)
         # The template already added BOS / special tokens — don't add them twice.
         enc = self.tok(prompt, return_tensors="pt", add_special_tokens=False)
         enc = {k: v.to(self.device) for k, v in enc.items()}
