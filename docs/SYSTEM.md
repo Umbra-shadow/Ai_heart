@@ -1,15 +1,15 @@
-# Guardianity — Hackathon demo
+# Renji — Hackathon demo
 
-## What Guardianity is
-Guardianity gives **any** language model a **conscience** — without retraining it.
-A model (the *vessel*) stays exactly as it is; Guardianity's *heart* reads each turn
+## What Renji is
+Renji gives **any** language model a **conscience** — without retraining it.
+A model (the *vessel*) stays exactly as it is; Renji's *heart* reads each turn
 and decides, by geometry (not hard-coded rules), whether to **allow** it, **refuse
 it with care**, or shape *how* it's answered. The heart is the product; the model is
 yours.
 
 ## What this demo is (and isn't)
 This folder is a small, runnable **client**. It lets you chat with a local model and
-see it **governed by the Guardianity heart** in real time — and toggle the heart off
+see it **governed by the Renji heart** in real time — and toggle the heart off
 to see the raw model for comparison.
 
 **It does not contain the heart.** The conscience runs on our **live hosted
@@ -29,7 +29,7 @@ The heart can be reached two ways — pick whichever fits:
    YOUR MACHINE                                  OUR HOSTED SERVICE
  ┌───────────────────────────┐                 ┌────────────────────────┐
  │  this folder              │  POST /kagune/turn (Bearer key)          │
- │  ├─ llm.py  (your model)  │ ───────────────▶ │  the Guardianity heart │
+ │  ├─ llm.py  (your model)  │ ───────────────▶ │  the Renji heart │
  │  ├─ guardianity_client.py │ ◀─────────────── │  (Scale · gate · warm  │
  │  └─ app.py + web/  (chat) │   decision +     │   refusal · steering)  │
  │                           │   modulation     │                        │
@@ -62,7 +62,7 @@ The heart only ever receives the **text of the turn**; your model and its weight
 never leave your machine.
 
 ## Setup & run
-1. **Get an API key**: create an account on the Guardianity site and copy your key.
+1. **Get an API key**: create an account on the Renji site and copy your key.
 2. `cp .env.example .env`, then fill in:
    - `RENJI_KEY` — your key
    - `RENJI_URL` — the hosted-heart URL (shown on the site)

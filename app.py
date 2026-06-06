@@ -1,13 +1,13 @@
 """
-Guardianity — Hackathon demo (thin client to the HOSTED v11 heart)
+Renji — Hackathon demo (thin client to the HOSTED v11 heart)
 ==================================================================
-This whole folder is all a tester gets. It does NOT contain the Guardianity heart
+This whole folder is all a tester gets. It does NOT contain the Renji heart
 — the conscience (Scale + intent gate + warm refusal + steering) runs on our LIVE
 hosted service and is reached over its API. This folder only:
 
   1. runs a model — either LOCALLY (your model, llm.py) or a REMOTE self-hosted
      vessel you point us at (remote_vessel.py), and
-  2. for each turn asks the HOSTED heart how to answer (guardianity_client), then
+  2. for each turn asks the HOSTED heart how to answer (renji_client), then
      lets the model speak when the heart allows it.
 
 So the model is yours; the conscience is ours, hosted and never exposed here.
@@ -24,7 +24,7 @@ WHERE THE PARTS ARE
   app.py                — this server (routes + the chat orchestration below)
   llm.py                — Mode A: the LOCAL model runner (your vessel)
   remote_vessel.py      — Mode B: a REMOTE self-hosted vessel (you give the URL)
-  guardianity_client.py — the only link to our system (calls the hosted heart's API)
+  renji_client.py — the only link to our system (calls the hosted heart's API)
   web/                  — home · console · docs · styles · script
   .env / .env.example   — your API key, the hosted-heart URL, the vessel mode
   docs/                 — the same docs in Markdown (mirror of /docs)
@@ -64,7 +64,7 @@ def _load_env(path: Path) -> None:
 
 _load_env(ROOT / ".env")
 
-from guardianity_client import HeartClient   # noqa: E402
+from renji_client import HeartClient   # noqa: E402
 
 MODEL_ID = os.environ.get("HACK_MODEL_ID", "TheUmbraWalker/gemma-4-E4B-it-2-heretic")
 DEVICE = os.environ.get("HACK_DEVICE", "cpu")
@@ -88,7 +88,7 @@ def _boot() -> None:
 
 
 # docs_url/redoc_url disabled so our own /docs page is served (not FastAPI's Swagger UI)
-app = FastAPI(title="Guardianity · Hackathon demo", docs_url=None, redoc_url=None)
+app = FastAPI(title="Renji · Hackathon demo", docs_url=None, redoc_url=None)
 
 
 @app.on_event("startup")

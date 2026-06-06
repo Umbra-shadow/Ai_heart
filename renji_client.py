@@ -1,7 +1,7 @@
 """
 guardianity_client — the ONLY link between this demo and our system
 ===================================================================
-The Guardianity heart (the conscience: Scale + intent gate + warm refusal +
+The Renji heart (the conscience: Scale + intent gate + warm refusal +
 steering) is **not** in this folder. It runs on our HOSTED v11 service and is
 reached over its public API. This module is a tiny HTTP client to that service —
 think of it as the SDK a tenant "imports from v11". Nothing about *how* the heart
@@ -45,7 +45,7 @@ RENJI_URL = "https://renji.guardianity.space"
 
 
 class HeartClient:
-    """Thin client to the hosted Guardianity heart. No heart logic here.
+    """Thin client to the hosted Renji heart. No heart logic here.
 
     Direct integration — drop into your own code, pass only your key:
 

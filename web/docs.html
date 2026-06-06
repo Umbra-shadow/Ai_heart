@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guardianity · Docs</title>
+<title>Renji · Docs</title>
 <link rel="stylesheet" href="/web/style.css">
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="/"><span class="dot"></span> Guardianity <em>· docs</em></a>
+  <a class="brand" href="/"><span class="dot"></span> Renji <em>· docs</em></a>
   <nav>
     <a href="/">Home</a>
     <a href="/console">Console</a>
@@ -31,7 +31,7 @@
   </nav>
 
   <article class="doc">
-    <h1>Guardianity — Hackathon demo</h1>
+    <h1>Renji — Hackathon demo</h1>
     <p class="lead">Give <strong>any</strong> language model a conscience, without
     retraining it. Your model stays as it is; our <em>heart</em> reads each turn and
     decides — allow, refuse with care, or shape the answer. The model is yours; the
@@ -39,7 +39,7 @@
 
     <h2 id="what">What this is</h2>
     <p>This folder is a small, runnable <strong>client</strong>. It lets you chat with
-    a model <strong>governed by the Guardianity heart</strong> in real time — and flip
+    a model <strong>governed by the Renji heart</strong> in real time — and flip
     the heart off to see the raw model for comparison. It does <strong>not</strong>
     contain the heart: the conscience runs on our live hosted service and is
     reached over its API. The full system (the Umbra language and the rest) is not
@@ -49,7 +49,7 @@
     <pre><code>   YOUR MACHINE                                  OUR LIVE SERVICE        
  ┌───────────────────────────┐                 ┌────────────────────────┐
  │  this folder              │  POST /kagune/turn (Bearer key)          │
- │  ├─ your model            │ ───────────────▶ │  the Guardianity heart │
+ │  ├─ your model            │ ───────────────▶ │  the Renji heart │
  │  ├─ guardianity_client.py │ ◀─────────────── │  (Scale · gate · warm  │
  │  └─ console + docs        │   decision +     │   refusal · steering)  │
  │                           │   modulation     │                        │
@@ -77,7 +77,7 @@
 
     <h2 id="key">Getting your key</h2>
     <ol>
-      <li>Go to the <strong>Renji / Guardianity website</strong> and <strong>create an
+      <li>Go to the <strong>Renji website</strong> and <strong>create an
       account</strong> (during the event, verification is open — just sign up).</li>
       <li>Copy your <strong>API key</strong> and the <strong>hosted-heart URL</strong>.</li>
       <li>Choose your connection mode (direct or remote) — see above.</li>
@@ -136,6 +136,20 @@
       turn's text.</li>
       <li>This is for <strong>testing</strong> during the event — an open trial.</li>
       <li>Nothing here exposes the heart's internals. By design.</li>
+    </ul>
+
+    <h2 id="part-of-renji">This is only a part of Renji</h2>
+    <p>What you're running is a <strong>faithful slice</strong> of Renji — a model
+    governed, given feeling, and pushed to research. The <strong>full system is not
+    published</strong>, on purpose, for two reasons:</p>
+    <ul>
+      <li><strong>It's still being built.</strong> What you see is real and runs today,
+      but it's part of a larger system under active development.</li>
+      <li><strong>Some of what the full system can do is not safe to hand out.</strong>
+      It's powerful enough that releasing all of it openly would be dangerous — which
+      is exactly the point of the part you <em>can</em> see: <strong>Renji exists to
+      keep capability good</strong>. We hold the rest back until that holds under every
+      condition.</li>
     </ul>
   </article>
 </div>

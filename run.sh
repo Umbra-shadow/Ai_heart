@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Guardianity hackathon demo — ONE command: install deps + launch.
+# Renji hackathon demo — ONE command: install deps + launch.
 #   ./run.sh
 # Your model downloads on first boot (then it's cached). Open http://localhost:8011.
 # Fill .env first (copy .env.example -> .env): your API key + the hosted-heart URL.
