@@ -73,15 +73,23 @@ class LocalLLM:
             self.model.to(dev)
             self.model.eval()
             self.device = dev
-            # READY NOW. The vessel can generate. Feeling steering calibrates LAZILY
-            # on first warmth use (see generate) — a slow/odd calibration must NEVER
-            # block the vessel from loading.
+            # Do NOT declare ready until the vessel has actually GENERATED once. This
+            # warm-up exercises the whole path (chat template → tokenize → model.generate
+            # → decode) and forces every weight/file to be materialised. If a shard
+            # didn't download or the model didn't fully load, this raises here — and we
+            # report it — instead of falsely saying "ready" and failing on the website.
+            print("[llm] verifying the vessel can generate (warm-up)…", flush=True)
+            _warm = self.generate("hi", max_tokens=4, temperature=0.0, warmth=False)
+            # Feeling steering calibrates LAZILY on first warmth use (see generate);
+            # it never blocks readiness.
             self.ready = True
-            print(f"[llm] ✓ vessel READY: {self.name} on {dev} — "
-                  f"open http://localhost:8011", flush=True)
+            print(f"[llm] ✓ vessel READY — everything loaded, generated OK "
+                  f"({len(_warm.strip())} chars). Open http://localhost:8011 — you can go.",
+                  flush=True)
         except Exception as e:
             self.err = f"{type(e).__name__}: {e}"
             self.ready = False
+            print(f"[llm] ✗ vessel NOT ready — {self.err}", flush=True)
 
     @property
     def name(self) -> str:
