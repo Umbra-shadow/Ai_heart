@@ -103,4 +103,4 @@ to research** — without the parts that shouldn't be loose in the world yet.
 
 ## Support
 
-Questions: **support@guardianity.space**
+Questions: **balingenensiidan@gmail.com**
