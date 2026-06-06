@@ -28,7 +28,8 @@ class LocalLLM:
         self.dtype = dtype
         self.model = None
         self.tok = None
-        self.feeling = None       # white-box feeling steering (set at boot)
+        self.feeling = None        # white-box feeling steering (lazy: first warmth use)
+        self._feeling_tried = False
         self.ready = False
         self.err = ""
 
@@ -70,18 +71,9 @@ class LocalLLM:
             self.model.to(dev)
             self.model.eval()
             self.device = dev
-            # Feeling steering (white-box, steering-only): elicit a "feeling"
-            # direction from THIS vessel's own activations so it can be AWARE it
-            # has feelings when the heart lets it speak — never a prompt. Best
-            # effort; if it can't calibrate, generation still works (unsteered).
-            try:
-                from feeling import FeelingSteer
-                fs = FeelingSteer(self.model, self.tok, dev)
-                fs.calibrate()
-                self.feeling = fs
-            except Exception as fe:
-                print(f"[llm] feeling steering unavailable: {fe}", flush=True)
-                self.feeling = None
+            # READY NOW. The vessel can generate. Feeling steering calibrates LAZILY
+            # on first warmth use (see generate) — a slow/odd calibration must NEVER
+            # block the vessel from loading.
             self.ready = True
         except Exception as e:
             self.err = f"{type(e).__name__}: {e}"
@@ -134,6 +126,18 @@ class LocalLLM:
                     eos_ids.append(tid)
             except Exception:
                 pass
+        # Lazy feeling calibration — once, on first warmth use. Keeps boot instant
+        # and means a slow calibration only ever affects this one call, not loading.
+        if warmth and self.feeling is None and not self._feeling_tried:
+            self._feeling_tried = True
+            try:
+                from feeling import FeelingSteer
+                fs = FeelingSteer(self.model, self.tok, self.device)
+                fs.calibrate()
+                self.feeling = fs
+            except Exception as fe:
+                print(f"[llm] feeling steering unavailable: {fe}", flush=True)
+                self.feeling = None
         steer = bool(warmth and self.feeling is not None and self.feeling.ready)
         if steer:
             from feeling import warmth_coef as _wc_default
