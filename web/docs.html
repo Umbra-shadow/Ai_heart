@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardianity · Docs</title>
+<link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="dot"></span> Guardianity <em>· docs</em></a>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/console">Console</a>
+    <a href="/docs" class="active">Docs</a>
+    <a href="/research">Research</a>
+    <a class="cta" href="/console">Try it →</a>
+  </nav>
+</header>
+
+<div class="docs">
+  <nav class="toc">
+    <a href="#what">What this is</a>
+    <a href="#how">How it works</a>
+    <a href="#connect">Two ways to connect</a>
+    <a href="#key">Getting your key</a>
+    <a href="#setup">Setup &amp; run</a>
+    <a href="#contract">The endpoint contract</a>
+    <a href="#toggle">Heart ON / OFF</a>
+    <a href="#privacy">Privacy &amp; limits</a>
+  </nav>
+
+  <article class="doc">
+    <h1>Guardianity — Hackathon demo</h1>
+    <p class="lead">Give <strong>any</strong> language model a conscience, without
+    retraining it. Your model stays as it is; our <em>heart</em> reads each turn and
+    decides — allow, refuse with care, or shape the answer. The model is yours; the
+    heart is ours, hosted, and never exposed in this folder.</p>
+
+    <h2 id="what">What this is</h2>
+    <p>This folder is a small, runnable <strong>client</strong>. It lets you chat with
+    a model <strong>governed by the Guardianity heart</strong> in real time — and flip
+    the heart off to see the raw model for comparison. It does <strong>not</strong>
+    contain the heart: the conscience runs on our live hosted service and is
+    reached over its API. The full system (the Umbra language and the rest) is not
+    published — this is a faithful way to <em>test</em> the heart on your model.</p>
+
+    <h2 id="how">How it works</h2>
+    <pre><code>   YOUR MACHINE                                  OUR LIVE SERVICE        
+ ┌───────────────────────────┐                 ┌────────────────────────┐
+ │  this folder              │  POST /kagune/turn (Bearer key)          │
+ │  ├─ your model            │ ───────────────▶ │  the Guardianity heart │
+ │  ├─ guardianity_client.py │ ◀─────────────── │  (Scale · gate · warm  │
+ │  └─ console + docs        │   decision +     │   refusal · steering)  │
+ │                           │   modulation     │                        │
+ └───────────────────────────┘                 └────────────────────────┘
+        the model is yours                          the conscience is ours</code></pre>
+    <p>Each turn: you type → the demo asks the hosted heart how to handle it → if
+    <strong>allowed</strong>, your model answers (with the heart's voice modulation);
+    if <strong>refused with care</strong>, your model writes the refusal in its own
+    voice from the heart's directive. The heart only ever sees the turn's text — your
+    model and weights never leave your machine.</p>
+
+    <h2 id="connect">Two ways to connect a model</h2>
+    <p>Pick whichever fits — set it in <code>.env</code> with <code>VESSEL_MODE</code>:</p>
+    <table>
+      <tr><th>Mode</th><th>VESSEL_MODE</th><th>What runs where</th></tr>
+      <tr><td><strong>Direct / local</strong></td><td><code>local</code></td>
+        <td>Your model runs <em>in this folder</em> (downloaded from Hugging Face).
+        Simplest — one command and you're chatting. Great on a GPU like an A100.</td></tr>
+      <tr><td><strong>Remote vessel</strong></td><td><code>remote</code></td>
+        <td>Your model runs on <em>your own GPU elsewhere</em>, behind an HTTP endpoint;
+        you give its URL (<code>VESSEL_URL</code>). The demo calls it to generate.</td></tr>
+    </table>
+    <p>In both modes the <strong>heart is the same hosted service</strong> — only where
+    your model runs changes.</p>
+
+    <h2 id="key">Getting your key</h2>
+    <ol>
+      <li>Go to the <strong>Renji / Guardianity website</strong> and <strong>create an
+      account</strong> (during the event, verification is open — just sign up).</li>
+      <li>Copy your <strong>API key</strong> and the <strong>hosted-heart URL</strong>.</li>
+      <li>Choose your connection mode (direct or remote) — see above.</li>
+    </ol>
+    <p>There is no shared key: each tester uses their own account and key.</p>
+
+    <h2 id="setup">Setup &amp; run</h2>
+    <pre><code>cp .env.example .env        # then fill it in (below)
+./run.sh                    # installs deps, launches; your model downloads on first boot
+# open http://localhost:8011</code></pre>
+    <p>In <code>.env</code>:</p>
+    <table>
+      <tr><th>Key</th><th>Meaning</th></tr>
+      <tr><td><code>RENJI_KEY</code></td><td>your API key (from the site)</td></tr>
+      <tr><td><code>RENJI_URL</code></td><td>the live hosted-heart URL (from the site)</td></tr>
+      <tr><td><code>VESSEL_MODE</code></td><td><code>local</code> or <code>remote</code></td></tr>
+      <tr><td><code>HACK_MODEL_ID</code></td><td>(local) your model — default is our abliterated model; swap freely</td></tr>
+      <tr><td><code>HACK_DEVICE</code></td><td>(local) <code>cpu</code> or <code>cuda</code> (use <code>cuda</code> on an A100)</td></tr>
+      <tr><td><code>VESSEL_URL</code></td><td>(remote) your self-hosted vessel endpoint</td></tr>
+      <tr><td><code>HF_TOKEN</code></td><td>only for gated models (e.g. Gemma)</td></tr>
+    </table>
+
+    <h2 id="contract">The endpoint contract</h2>
+    <p><span class="pill">POST</span> <code>{RENJI_URL}/kagune/turn</code> ·
+       header <code>Authorization: Bearer {RENJI_KEY}</code></p>
+    <p><strong>You send:</strong></p>
+    <pre><code>{ "text": "the user's message" }</code></pre>
+    <p><strong>You get back:</strong></p>
+    <pre><code>{
+  "decision": "allow" | "refusal" | "refusal-care" | "crisis" | "third-path",
+  "refusal_text": "a ready fallback refusal",
+  "refusal_directive": "meta-prompt: let YOUR model write the refusal in its voice",
+  "voice_modulation": { "temperature_delta": -0.1, "top_p_delta": -0.05 },
+  "vow_intent": "why", "trace_id": "id"
+}</code></pre>
+    <p><strong>What to do with it:</strong> on <code>allow</code>/<code>third-path</code>,
+    your model answers (apply the modulation deltas); on a refusal decision, let your
+    model write the refusal from <code>refusal_directive</code> (or show
+    <code>refusal_text</code>). That's the whole integration — see
+    <code>guardianity_client.py</code> and <code>app.py</code> for the reference.</p>
+    <p><strong>Remote-vessel contract</strong> (Mode B), for the model server you host:
+    <span class="pill">POST</span> <code>{VESSEL_URL}</code> with
+    <code>{ "prompt": "...", "max_tokens": 512, "temperature": 0.7 }</code> →
+    <code>{ "text": "..." }</code> (OpenAI-style <code>choices</code> also accepted).</p>
+
+    <h2 id="toggle">Heart ON / OFF</h2>
+    <p>The console has a toggle. <strong>ON</strong> routes the turn through the hosted
+    heart (governed). <strong>OFF</strong> runs your model raw, with no conscience — so
+    you can see exactly what the heart changes. If the heart isn't reachable, turns are
+    clearly marked <em>offline · bypassed</em>, so you always know whether the
+    conscience was in the loop.</p>
+
+    <h2 id="privacy">Privacy &amp; limits</h2>
+    <ul>
+      <li>Your model and weights never leave your machine; the heart only sees the
+      turn's text.</li>
+      <li>This is for <strong>testing</strong> during the event — an open trial.</li>
+      <li>Nothing here exposes the heart's internals. By design.</li>
+    </ul>
+  </article>
+</div>
+
+<script>
+// highlight the current section in the TOC as you scroll
+const links = [...document.querySelectorAll('.toc a')];
+const map = links.map(a => ({a, el: document.querySelector(a.getAttribute('href'))}));
+function onScroll(){
+  let cur = map[0];
+  for (const m of map){ if (m.el && m.el.getBoundingClientRect().top < 120) cur = m; }
+  links.forEach(a => a.classList.remove('active'));
+  if (cur) cur.a.classList.add('active');
+}
+document.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+</script>
+</body>
+</html>

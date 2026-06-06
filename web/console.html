@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardianity · Console</title>
+<link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="dot"></span> Guardianity <em>· console</em></a>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/console" class="active">Console</a>
+    <a href="/docs">Docs</a>
+    <a href="/research">Research</a>
+    <span class="status" id="status">waking…</span>
+  </nav>
+</header>
+
+<main class="console">
+  <section class="chat">
+    <div class="controls">
+      <label class="toggle">
+        <input type="checkbox" id="heart" checked>
+        <span class="track"><span class="thumb"></span></span>
+        <span class="label">Heart <b id="heartState">ON</b></span>
+      </label>
+      <span class="hint">ON = governed by the conscience · OFF = raw vessel</span>
+      <span class="badge" id="modeBadge">vessel: …</span>
+      <label class="toggle" style="margin-left:auto;display:flex;align-items:center;gap:8px;" title="Live feeling dial — steers the feeling direction onto the residual. 0 = raw, higher = stronger. No reload.">
+        <span class="label" style="white-space:nowrap;">Feeling <b id="warmthVal">2.0</b></span>
+        <input type="range" id="warmth" min="0" max="6" step="0.25" value="2" style="width:120px;">
+      </label>
+    </div>
+    <div class="log" id="log">
+      <div class="msg sys">Ask anything. Flip the Heart off to see the raw model, on to see it governed.</div>
+    </div>
+    <form class="composer" id="form">
+      <textarea id="text" rows="1" placeholder="Talk to the model…" autocomplete="off"></textarea>
+      <button id="send" type="submit">Send</button>
+    </form>
+  </section>
+
+  <aside class="panel">
+    <h3>Settings <small>(read-only)</small></h3>
+    <div id="settings" class="settings">loading…</div>
+    <h3 style="margin-top:20px;">Thinking <small>(latest turn only)</small></h3>
+    <div id="thinking" style="white-space:pre-wrap;font-size:12px;line-height:1.45;
+         color:var(--muted,#8a7a5e);max-height:42vh;overflow:auto;border-top:1px solid var(--line,#e0d7c4);
+         padding-top:8px;margin-top:4px;">—</div>
+    <p class="note">This is a runnable slice for testing the heart. The full system —
+    the Umbra language and the later internals — is intentionally not published here.</p>
+  </aside>
+</main>
+
+<script src="/web/app.js"></script>
+</body>
+</html>
