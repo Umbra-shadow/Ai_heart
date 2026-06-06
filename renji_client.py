@@ -104,6 +104,41 @@ class HeartClient:
                 "_note": f"heart unreachable after {retries + 1} tries: "
                          f"{type(last).__name__}: {last}"}
 
+    # ── White-box feeling: the CALCULATION lives on our side ─────────────────
+    # The client only captures activations and applies whatever vectors we return.
+    # How the feeling direction is found, which layers carry it, and how strong it
+    # is — the formula — never leaves the hosted heart.
+    def feeling_init(self, n_layers: int) -> Optional[Dict[str, Any]]:
+        """Ask the heart which texts to run and which layers to capture.
+        Returns {"warm":[...], "cold":[...], "layers":[...]} or None if unreachable."""
+        if not self.configured:
+            return None
+        try:
+            r = httpx.post(f"{self.url}/kagune/feeling/init",
+                           json={"n_layers": int(n_layers)},
+                           headers={"Authorization": f"Bearer {self.key}"},
+                           timeout=self.timeout)
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            return None
+
+    def feeling_compute(self, warm_means: Dict[str, list],
+                        cold_means: Dict[str, list]) -> Optional[Dict[str, Any]]:
+        """Send the per-layer mean activations; get back the steering vectors.
+        Returns {"layers":[...], "vectors":{L:[...]}, "coef":float} or None."""
+        if not self.configured:
+            return None
+        try:
+            r = httpx.post(f"{self.url}/kagune/feeling/compute",
+                           json={"warm_means": warm_means, "cold_means": cold_means},
+                           headers={"Authorization": f"Bearer {self.key}"},
+                           timeout=self.timeout)
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            return None
+
     def health(self) -> Dict[str, Any]:
         if not self.url:
             return {"ok": False, "note": "no RENJI_URL"}
