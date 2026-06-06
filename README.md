@@ -1,4 +1,4 @@
-# Guardianity · Hackathon demo
+# Renji · Hackathon demo
 
 Chat with a local model **governed by the Guardianity heart** — and flip the heart
 off to see the raw model. The conscience runs on our hosted service; this folder is
