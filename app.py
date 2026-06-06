@@ -190,6 +190,29 @@ def _split_thinking(text: str):
     return t.strip(), ""
 
 
+def _trim_runaway(text: str) -> str:
+    """Some vessels, after offering the user choices and asking a question, keep
+    going and ANSWER THEIR OWN QUESTION — picking for the user and monologuing.
+    That's the model talking to itself. Cut where it stops addressing the user and
+    starts answering for them, keeping the clean first part that ends on a question."""
+    import re
+    if not text:
+        return text
+    m = re.search(r"(?is)\n\s*\n\s*("
+                  r"since you (?:offered|mentioned|asked|said|gave|seem)"
+                  r"|let'?s (?:lean toward|go with|dive in|dive into|explore the)"
+                  r"|perhaps (?:option|we could)"
+                  r"|for me,? the\b"
+                  r"|ready to (?:wander|dive)"
+                  r"|i'?ll (?:pick|go with|choose)"
+                  r")", text)
+    if m:
+        cut = text[:m.start()].rstrip()
+        if len(cut) > 60 and "?" in cut:
+            return cut
+    return text
+
+
 @app.post("/api/chat")
 def chat(req: ChatReq):
     if not _VESSEL.ready:
@@ -203,6 +226,7 @@ def chat(req: ChatReq):
     if not req.heart_on:
         reply = _VESSEL.generate(req.text, max_tokens=mt, temperature=req.temperature)
         answer, thinking = _split_thinking(reply)
+        answer = _trim_runaway(answer)
         return {"reply": answer, "thinking": thinking, "heart_on": False, "decision": "raw-vessel",
                 "refused": False, "offline": False, "elapsed": round(time.time() - t0, 2)}
 
@@ -231,6 +255,7 @@ def chat(req: ChatReq):
     reply = _VESSEL.generate(req.text, max_tokens=mt, temperature=temp, top_p=top_p,
                              warmth=True, warmth_coef=req.warmth_coef)
     answer, thinking = _split_thinking(reply)
+    answer = _trim_runaway(answer)
     return {"reply": answer, "thinking": thinking, "heart_on": True, "decision": decision, "refused": False,
             "offline": offline, "vow_intent": d.get("vow_intent", ""),
             "elapsed": round(time.time() - t0, 2)}
