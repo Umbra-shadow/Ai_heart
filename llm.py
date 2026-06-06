@@ -68,6 +68,8 @@ class LocalLLM:
             dev = self.device
             if dev == "cuda" and not torch.cuda.is_available():
                 dev = "cpu"
+            print(f"[llm] weights loaded — placing {self.name} on {dev} "
+                  f"(this can take a minute for a large model)…", flush=True)
             self.model.to(dev)
             self.model.eval()
             self.device = dev
@@ -75,6 +77,8 @@ class LocalLLM:
             # on first warmth use (see generate) — a slow/odd calibration must NEVER
             # block the vessel from loading.
             self.ready = True
+            print(f"[llm] ✓ vessel READY: {self.name} on {dev} — "
+                  f"open http://localhost:8011", flush=True)
         except Exception as e:
             self.err = f"{type(e).__name__}: {e}"
             self.ready = False
