@@ -307,8 +307,13 @@ def session_info():
 
 @app.post("/api/wipe")
 def wipe():
-    """Forget this session's memory — a fresh id, empty history. (The live v11
-    product wipes a persistent per-user soul instead; here memory is per-launch.)"""
+    """Forget this session's memory — clear the vessel's history AND the heart's
+    soul for this session, then start a fresh id."""
+    old = _SESSION["id"]
+    try:
+        _HEART.wipe_memory(conversation_id=old)   # forget the soul on the heart too
+    except Exception:
+        pass
     _SESSION["history"].clear()
     _SESSION["id"] = _uuid.uuid4().hex
     return {"ok": True, "session": _SESSION["id"], "turns": 0}

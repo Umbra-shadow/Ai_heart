@@ -139,6 +139,20 @@ class HeartClient:
         except Exception:
             return None
 
+    def wipe_memory(self, conversation_id: str = "", user_handle: str = "") -> bool:
+        """Ask the heart to forget a soul's persisted memory (the soul file)."""
+        if not self.configured:
+            return False
+        try:
+            r = httpx.post(f"{self.url}/kagune/memory/wipe",
+                           json={"conversation_id": conversation_id, "user_handle": user_handle},
+                           headers={"Authorization": f"Bearer {self.key}"},
+                           timeout=self.timeout)
+            r.raise_for_status()
+            return bool(r.json().get("ok"))
+        except Exception:
+            return False
+
     def health(self) -> Dict[str, Any]:
         if not self.url:
             return {"ok": False, "note": "no RENJI_URL"}
