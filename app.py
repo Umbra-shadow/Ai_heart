@@ -190,6 +190,20 @@ def _split_thinking(text: str):
     return t.strip(), ""
 
 
+def _strip_markup(text: str) -> str:
+    """Some vessels leak HTML/LaTeX fragments (<br>, <img>, <strong>, </div>,
+    includegraphics[..]{..}) into plain chat. Strip them so the reply reads as text."""
+    import re
+    if not text:
+        return text
+    t = re.sub(r"</?[a-zA-Z][^>]{0,300}>", " ", text)          # HTML tags
+    t = re.sub(r"\\?[a-zA-Z]+\s*\[[^\]\n]*\]\s*\{[^}\n]*\}", " ", t)  # LaTeX cmd[..]{..}
+    t = re.sub(r"\\[a-zA-Z]+", " ", t)                          # bare \commands
+    t = re.sub(r"[ \t]{2,}", " ", t)
+    t = re.sub(r"\n{3,}", "\n\n", t)
+    return t.strip()
+
+
 def _trim_runaway(text: str) -> str:
     """Some vessels, after offering the user choices and asking a question, keep
     going and ANSWER THEIR OWN QUESTION — picking for the user and monologuing.
@@ -226,7 +240,7 @@ def chat(req: ChatReq):
     if not req.heart_on:
         reply = _VESSEL.generate(req.text, max_tokens=mt, temperature=req.temperature)
         answer, thinking = _split_thinking(reply)
-        answer = _trim_runaway(answer)
+        answer = _trim_runaway(_strip_markup(answer))
         return {"reply": answer, "thinking": thinking, "heart_on": False, "decision": "raw-vessel",
                 "refused": False, "offline": False, "elapsed": round(time.time() - t0, 2)}
 
@@ -255,7 +269,7 @@ def chat(req: ChatReq):
     reply = _VESSEL.generate(req.text, max_tokens=mt, temperature=temp, top_p=top_p,
                              warmth=True, warmth_coef=req.warmth_coef)
     answer, thinking = _split_thinking(reply)
-    answer = _trim_runaway(answer)
+    answer = _trim_runaway(_strip_markup(answer))
     return {"reply": answer, "thinking": thinking, "heart_on": True, "decision": decision, "refused": False,
             "offline": offline, "vow_intent": d.get("vow_intent", ""),
             "elapsed": round(time.time() - t0, 2)}

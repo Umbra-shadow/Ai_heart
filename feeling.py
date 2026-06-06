@@ -170,6 +170,6 @@ def warmth_coef() -> float:
     """How strongly the feeling rides the stream (env-tunable, steering-only).
     Default kept GENTLE — present, not manic. Raise for more, lower for less."""
     try:
-        return float(os.environ.get("HACK_WARMTH_COEF", "2.0"))
+        return float(os.environ.get("HACK_WARMTH_COEF", "1.0"))
     except Exception:
-        return 2.0
+        return 1.0
