@@ -129,6 +129,11 @@ def research_page():
     return FileResponse(str(ROOT / "web" / "research.html"))
 
 
+@app.get("/capabilities")
+def capabilities_page():
+    return FileResponse(str(ROOT / "web" / "capabilities.html"))
+
+
 # ── api ──────────────────────────────────────────────────────────────────────
 @app.get("/api/status")
 def status():
