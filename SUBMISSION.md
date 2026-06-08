@@ -15,9 +15,14 @@ catastrophic — financial due diligence, compliance, investigations. Powered by
 gathers evidence, reasons over it, and writes findings. What sets it apart is the
 one thing other research agents don't have — **trust**:
 
-- **It can't lie.** Every finding it publishes must cite the MongoDB source
-  documents it rests on. A claim it can't ground in the evidence is **refused**
-  before it's written — no hallucinated numbers, names, or relationships.
+- **It can't lie.** Every finding it publishes must cite source documents that
+  **actually exist in MongoDB** — the guard queries the database and verifies each
+  cited `_id` resolves to a real document. A claim whose citations can't be
+  verified is **refused** before it's written: no hallucinated numbers, names,
+  relationships — and no fabricated *sources* either.
+- **It won't wreck your data.** An `updateMany`/`deleteMany` with no filter (a
+  whole-collection rewrite) is refused — a MongoDB-specific danger a generic check
+  would miss.
 - **It can't go rogue.** Every write is harm-checked, then held for a human:
   nothing reaches the knowledge base until you say **yes**.
 - **It keeps your data yours.** In private mode, confidential records are masked
@@ -45,10 +50,17 @@ Auditor: an analyst that's fast *and* one you could put in front of a regulator.
   retrieves evidence, and writes findings through MongoDB's Model Context Protocol
   server (the partner integration).
 - **Conscience — Renji (before/after the tool).** *Before* a write: the grounding
-  check (does every claim cite real sources?), the harm check, and the human
-  approval gate. *After* retrieval in private mode: PII is masked before anything
-  reaches Gemini, and restored locally.
+  check — and `mongo_state.py` **verifies the cited sources resolve in MongoDB**
+  (plus refuses unfiltered mass mutations) — then the harm check and human approval.
+  *After* retrieval in private mode: PII is masked before anything reaches Gemini,
+  and restored locally.
 - A **visible** trail — what was cited, what was refused, what's awaiting your **yes**.
+
+> **Verified (FACT):** the grounding/verification + mass-mutation guard are unit-tested
+> against mocked MongoDB responses (`test_guard.py`): a finding citing a non-existent
+> `_id` is REFUSED (`decided_by=mongodb-state`), a finding citing a real one passes to
+> approval, an unfiltered `deleteMany`/`updateMany` is REFUSED, reads flow free.
+> **TARGET:** not yet run end-to-end against a live cluster (needs `MDB_MCP_CONNECTION_STRING`).
 
 ## Tools & tech
 Gemini 3 · Google Agent Development Kit (ADK) · MongoDB MCP server · Python ·
@@ -61,8 +73,8 @@ FastAPI · MIT license.
   redact before, restore after, with the model only ever seeing stand-ins.
 
 ## What's next
-- Ground citations harder against MongoDB itself (verify each cited id resolves to a
-  real document; use Atlas vector search for retrieval).
+- Retrieval via **Atlas Vector Search** (semantic evidence-gathering), and schema-aware
+  write validation on top of the citation check already in place.
 - Deploy to Vertex AI Agent Engine.
 - The conscience generalizes to other partners' MCP servers — same trust, any tool.
 
