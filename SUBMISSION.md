@@ -1,7 +1,7 @@
-# Auditor
+# Foreman
 
 > **Tagline (≤200 chars):**
-> Auditor: a Gemini-3 research analyst that can't lie — every finding cites its MongoDB sources — and can't go rogue: it asks before it writes, and keeps your confidential data yours.
+> Foreman: a Gemini-3 research analyst that can't lie — every finding cites its MongoDB sources — and can't go rogue: it asks before it writes, and keeps your confidential data yours.
 
 **Track:** MongoDB partner — *Google Cloud Rapid Agent Hackathon*
 **Built with:** Gemini 3 · Google ADK · MongoDB MCP server · MIT licensed
@@ -9,7 +9,7 @@
 ---
 
 ## What it does
-Auditor is an **autonomous research analyst** for work where a made-up number is
+Foreman is an **autonomous research analyst** for work where a made-up number is
 catastrophic — financial due diligence, compliance, investigations. Powered by
 **Gemini 3**, it runs multi-step research over a **MongoDB knowledge base**: it
 gathers evidence, reasons over it, and writes findings. What sets it apart is the
@@ -29,7 +29,7 @@ one thing other research agents don't have — **trust**:
   before they ever reach the cloud model — Gemini reasons on stand-ins, and the
   real values are restored locally.
 
-*Capable* isn't enough in finance and compliance. Auditor is capable **and only-good.**
+*Capable* isn't enough in finance and compliance. Foreman is capable **and only-good.**
 
 ## Inspiration  *(draft — refine with your real story)*
 A wrong figure in a due-diligence memo isn't a bug — it's a lawsuit, a bad deal, a
@@ -38,7 +38,7 @@ number with total confidence and no source. We'd already built **Renji**, a
 conscience layer that refuses harm and ungrounded claims. MongoDB — where the
 evidence actually lives — was the right place to make "can't lie" literal: a
 finding is only allowed if it cites the documents it came from. So we built
-Auditor: an analyst that's fast *and* one you could put in front of a regulator.
+Foreman: an analyst that's fast *and* one you could put in front of a regulator.
 > **→ Tell me where you actually started (the MongoDB part, what specifically
 > inspired you) and I'll weave your real story in here.**
 
@@ -85,4 +85,4 @@ FastAPI · MIT license.
 - [x] Gemini 3 + Google ADK + MongoDB MCP (partner) + grounding/harm/approval/redaction
 - [ ] Hosted URL (Azure box / Vertex / Cloud Run)
 - [ ] ~3-min demo video (lead: an **ungrounded claim refused**, then a write held for approval)
-- [ ] Devpost form (name **Auditor**, tagline above, this story, MongoDB track)
+- [ ] Devpost form (name **Foreman**, tagline above, this story, MongoDB track)

@@ -1,5 +1,5 @@
 """
-test_guard — verify Auditor's MongoDB-aware oversight without a live cluster.
+test_guard — verify Foreman's MongoDB-aware oversight without a live cluster.
 Mocks mongo_state.verify_sources (the DB citation check) and exercises the real
 guard + the real is_mass_mutation logic. Run: python3 test_guard.py
 """
