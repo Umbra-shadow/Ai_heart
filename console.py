@@ -224,7 +224,8 @@ def _redaction() -> Dict[str, Any]:
 
 
 # ── app ─────────────────────────────────────────────────────────────────────
-app = FastAPI(title="Foreman")
+# docs_url/redoc_url=None so FastAPI's auto API page doesn't shadow our /docs page.
+app = FastAPI(title="Foreman", docs_url=None, redoc_url=None)
 
 
 @app.get("/", response_class=HTMLResponse)
