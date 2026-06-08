@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Renji Research Lab — ONE command: venv + deps + launch the agent UI.
+# Foreman — ONE command: venv + deps + launch the agent UI.
 #   ./run.sh
 # Fill .env first (copy .env.example -> .env): GEMINI_API_KEY + MDB_MCP_CONNECTION_STRING.
 # Needs Node/npx on PATH (the MongoDB MCP server is fetched on first run).
@@ -26,7 +26,28 @@ echo "==> [1/2] python deps (venv .venv, one-time)"
 python -m pip install -q -U pip wheel || true
 python -m pip install -q -r requirements.txt
 
-echo "==> [2/2] launch the agent UI  ·  pick 'renji_research_lab'"
-echo "    (ADK serves a local URL; the MongoDB MCP server is fetched via npx on first run)"
-# `adk web` discovers the module-level root_agent in agent.py.
-exec adk web
+PORT="${PORT:-8011}"
+
+# Free the port if a previous run left something bound to it (the npx MCP child
+# can inherit the listening socket and keep it open). No more "address already in use".
+free_port() {
+  # `|| true` so a free port (fuser/lsof return non-zero when nothing's there)
+  # doesn't trip `set -e` and kill the script.
+  command -v fuser >/dev/null 2>&1 && fuser -k "${PORT}/tcp" >/dev/null 2>&1 || true
+  command -v lsof  >/dev/null 2>&1 && lsof -ti "tcp:${PORT}" 2>/dev/null | xargs -r kill >/dev/null 2>&1 || true
+  return 0
+}
+free_port; sleep 0.4
+
+# On Ctrl+C / exit, stop uvicorn AND free the port so nothing lingers for next time.
+cleanup() { trap - EXIT INT TERM; [ -n "${UPID:-}" ] && kill "$UPID" >/dev/null 2>&1; sleep 0.3; free_port; }
+trap cleanup EXIT INT TERM
+
+echo "==> [2/2] launch Foreman console  ->  http://127.0.0.1:${PORT}"
+echo "    (agent runs in-process; MongoDB MCP fetched via npx on first run)"
+echo "    enter an unsolved problem · Ctrl+C frees the port automatically"
+# console.py serves web/console.html and runs root_agent (agent.py) via the ADK Runner.
+# Run in the background (not exec) so the trap can clean up on Ctrl+C.
+python -m uvicorn console:app --host 127.0.0.1 --port "${PORT}" &
+UPID=$!
+wait "$UPID"

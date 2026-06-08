@@ -1,4 +1,4 @@
-# How the Research Lab works — in plain words
+# How Foreman works — in plain words
 
 A research analyst you can trust with autonomy. It does real, multi-step work over
 a knowledge base, but it **cannot make things up** and **cannot act without you.**

@@ -7,3 +7,6 @@ google-genai>=1.0        # Gemini (AI Studio) client used by ADK
 httpx>=0.27              # the thin client to the hosted Renji heart
 python-dotenv>=1.0       # (optional) .env loading; agent.py also loads .env itself
 pymongo>=4.6   # guard verifies cited sources resolve in MongoDB
+fastapi>=0.115           # the console (run.sh) — one place to see + act, driven by .env
+uvicorn[standard]>=0.30  # serves the console
+fpdf2>=2.7               # the final answer -> downloadable PDF report

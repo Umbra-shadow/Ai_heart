@@ -1,4 +1,4 @@
-# The Research Lab · a Gemini-3 analyst that can't lie or go rogue
+# Foreman · a Gemini-3 analyst that can't lie or go rogue
 
 > **Google Cloud Rapid Agent Hackathon — MongoDB partner track.**
 
@@ -85,7 +85,7 @@ our own system here as a component; we ship the door, not the house.*
 ```bash
 cp .env.example .env     # paste GEMINI_API_KEY + MDB_MCP_CONNECTION_STRING (+ RENJI_KEY)
 ./run.sh                 # makes a venv, installs deps, launches the agent UI
-# open the printed URL → pick the agent "renji_research_lab"
+# open the printed URL → pick the agent "foreman"
 ```
 
 `run.sh` brings up **`adk web`**, the ready-made chat UI from Google's **Agent

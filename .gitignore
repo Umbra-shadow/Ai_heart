@@ -5,3 +5,4 @@ state/
 *.log
 .python_packages/
 *.pdf
+.venv/
