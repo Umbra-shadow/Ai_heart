@@ -88,8 +88,10 @@ cp .env.example .env     # paste GEMINI_API_KEY + MDB_MCP_CONNECTION_STRING (+ R
 # open the printed URL → pick the agent "renji_research_lab"
 ```
 
-`run.sh` brings up **`adk web`**, ADK's ready-made chat UI. Node/`npx` must be
-installed (the MongoDB MCP server is fetched on first run).
+`run.sh` brings up **`adk web`**, the ready-made chat UI from Google's **Agent
+Development Kit (ADK)** — the open-source framework behind Vertex AI's Agent Builder
+/ Agent Engine. Node/`npx` must be installed (the MongoDB MCP server is fetched on
+first run).
 
 **Seed a little evidence** (any Mongo client / Atlas UI) so the agent has something
 to research — e.g. a `filings` collection with a couple of documents, and an empty
