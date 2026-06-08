@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Renji hackathon demo — ONE command: install deps + launch.
+# Renji Research Lab — ONE command: venv + deps + launch the agent UI.
 #   ./run.sh
-# Your model downloads on first boot (then it's cached). Open http://localhost:8011.
-# Fill .env first (copy .env.example -> .env): your API key + the hosted-heart URL.
-# On a GPU (A100): install the CUDA build of torch, then set HACK_DEVICE=cuda in .env.
+# Fill .env first (copy .env.example -> .env): GEMINI_API_KEY + MDB_MCP_CONNECTION_STRING.
+# Needs Node/npx on PATH (the MongoDB MCP server is fetched on first run).
 # ============================================================================
 set -e
 cd "$(dirname "$0")"
@@ -12,26 +11,22 @@ PY="${PYTHON:-python3}"
 
 if [ ! -f .env ]; then
   cp .env.example .env
-  echo "!! created .env from .env.example — open it and add your RENJI_KEY + RENJI_URL"
+  echo "!! created .env from .env.example — open it and add GEMINI_API_KEY + MDB_MCP_CONNECTION_STRING"
 fi
 
-DEV="$(grep -E '^HACK_DEVICE=' .env 2>/dev/null | cut -d= -f2 | tr -d ' ')"; DEV="${DEV:-cpu}"
-
-echo "==> [1/2] dependencies (one-time)  · device=${DEV}"
-$PY -m pip install -q -U pip wheel || true
-# keep an existing torch (a CUDA box already has the right build); only auto-install
-# when torch is missing — and then CPU-only torch ONLY if device=cpu, so a CUDA box
-# is never clobbered with a CPU build.
-if ! $PY -c "import torch" 2>/dev/null; then
-  if [ "$DEV" = "cuda" ]; then
-    echo "   !! torch not found and HACK_DEVICE=cuda — install the CUDA build for your platform"
-    echo "      (e.g. pip install torch --index-url https://download.pytorch.org/whl/cu128), then re-run."
-  else
-    $PY -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
-  fi
+# Node check (the partner MCP server runs via npx)
+if ! command -v npx >/dev/null 2>&1; then
+  echo "!! npx not found — install Node.js (https://nodejs.org). The MongoDB MCP server needs it."
 fi
-$PY -m pip install -q -r requirements.txt
 
-PORT="$(grep -E '^HACK_PORT=' .env 2>/dev/null | cut -d= -f2 | tr -d ' ')"; PORT="${PORT:-8011}"
-echo "==> [2/2] launch -> http://localhost:${PORT}   (your model downloads on first boot)"
-exec $PY -m uvicorn app:app --host 127.0.0.1 --port "${PORT}"
+echo "==> [1/2] python deps (venv .venv, one-time)"
+[ -d .venv ] || "$PY" -m venv .venv
+# shellcheck disable=SC1091
+. .venv/bin/activate
+python -m pip install -q -U pip wheel || true
+python -m pip install -q -r requirements.txt
+
+echo "==> [2/2] launch the agent UI  ·  pick 'renji_research_lab'"
+echo "    (ADK serves a local URL; the MongoDB MCP server is fetched via npx on first run)"
+# `adk web` discovers the module-level root_agent in agent.py.
+exec adk web
